@@ -17,9 +17,9 @@ Go 언어로 블록체인 스터디
   
 ```go
   func (b *blockchain) addBlock(data string) {
-  newBlock := block{data, "", b.getLastHash()}
-  hash := sha256.Sum256([]byte(newBlock.data + newBlock.prevHash))
-  newBlock.hash = fmt.Sprintf("%x", hash)
-  b.blocks = append(b.blocks, newBlock)
+    newBlock := block{data, "", b.getLastHash()}
+    hash := sha256.Sum256([]byte(newBlock.data + newBlock.prevHash))
+    newBlock.hash = fmt.Sprintf("%x", hash)
+    b.blocks = append(b.blocks, newBlock)
   }
 ```
