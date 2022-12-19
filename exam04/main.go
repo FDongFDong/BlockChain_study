@@ -1,9 +1,6 @@
 package main
 
-import (
-	"crypto/sha256"
-	"fmt"
-)
+import "coin/exam04/blockchain"
 
 func main() {
 	chain := blockchain.GetBlockchain()

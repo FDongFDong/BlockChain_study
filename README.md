@@ -23,3 +23,10 @@ Go 언어로 블록체인 스터디
     b.blocks = append(b.blocks, newBlock)
   }
 ```
+
+### block 추가 및 block 정보 가져오기
+
+[exam05]()
+
+기존에 private하게 만들어둔 block 정보를 public하게 만들어 준 후 AllBlocks() 함수를 통해 데이터를 읽어왔다. 
+
