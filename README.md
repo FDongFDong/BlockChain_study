@@ -1,10 +1,10 @@
 # BlockChain_study
 Go 언어로 블록체인 스터디
 ## Genesis Block 만들어보기
-[exam01]()
+[exam01](https://github.com/FDongFDong/BlockChain_study/tree/main/exam01)
  
 ## Genesis Block, Second Block, ... 만들어보기
-[exam02]()
+[exam02](https://github.com/FDongFDong/BlockChain_study/tree/main/exam02)
 
 ## Refactoring, Singleton 
 [exam03]()
