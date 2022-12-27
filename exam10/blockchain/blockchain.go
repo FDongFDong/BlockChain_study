@@ -41,7 +41,7 @@ func createBlock(data string) *Block {
 
 // export 함수
 func (b *blockchain) AddBlock(data string) {
-
+	fmt.Println("AddBlock = >", b.blocks)
 	b.blocks = append(b.blocks, createBlock(data))
 
 }
@@ -58,7 +58,7 @@ func GetBlockchain() *blockchain {
 
 // 사용자에게 field를 드러내주는 function(singleton의 철학)
 func (b *blockchain) AllBlocks() []*Block {
-
+	fmt.Println("AllBlocks = >", b.blocks)
 	return b.blocks
-	// return GetBlockchain().blocks
+
 }
