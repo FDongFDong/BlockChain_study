@@ -6,20 +6,21 @@ import (
 	"sync"
 )
 
-type block struct {
+// main.go에서 가져다 쓰기위해 임시로 대문자로 변경
+type Block struct {
 	Data     string
 	Hash     string
 	PrevHash string
 }
 type blockchain struct {
-	blocks []*block
+	blocks []*Block
 }
 
 var b *blockchain
 
 var once sync.Once
 
-func (b *block) calculateHash() {
+func (b *Block) calculateHash() {
 	hash := sha256.Sum256([]byte(b.Data + b.PrevHash))
 	b.Hash = fmt.Sprintf("%x", hash)
 }
@@ -32,15 +33,17 @@ func getLastHash() string {
 	return GetBlockchain().blocks[totalBlocks-1].Hash
 }
 
-func createBlock(data string) *block {
-	newBlock := block{data, "", getLastHash()}
+func createBlock(data string) *Block {
+	newBlock := Block{data, "", getLastHash()}
 	newBlock.calculateHash()
 	return &newBlock
 }
 
 // export 함수
 func (b *blockchain) AddBlock(data string) {
+	fmt.Println("AddBlock = >", b.blocks)
 	b.blocks = append(b.blocks, createBlock(data))
+
 }
 
 func GetBlockchain() *blockchain {
@@ -54,7 +57,8 @@ func GetBlockchain() *blockchain {
 }
 
 // 사용자에게 field를 드러내주는 function(singleton의 철학)
-func (b *blockchain) AllBlocks() []*block {
+func (b *blockchain) AllBlocks() []*Block {
+	fmt.Println("AllBlocks = >", b.blocks)
 	return b.blocks
-	// return GetBlockchain().blocks
+
 }
