@@ -1,8 +1,8 @@
 package rest
 
 import (
-	"coin/exam21/blockchain"
-	"coin/exam21/utils"
+	"coin/exam23/blockchain"
+	"coin/exam23/utils"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -30,10 +30,6 @@ type urlDescription struct {
 
 type addBlockBody struct {
 	Message string `json:"message"`
-}
-
-type errorResponse struct {
-	ErrorMessage string `json:"errormessage"`
 }
 
 func (u urlDescription) String() string {
@@ -72,7 +68,7 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 func blocks(rw http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-
+		rw.Header().Add("Content-Type", "application/json")
 		json.NewEncoder(rw).Encode(blockchain.GetBlockchain().AllBlocks())
 	case "POST":
 		var addBlockBody addBlockBody
@@ -88,25 +84,13 @@ func block(rw http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(vars["height"])
 	utils.HandleErr(err)
 
-	block, err := blockchain.GetBlockchain().GetBlock(id)
-	encoder := json.NewEncoder(rw)
-	if err == blockchain.ErrNotFound {
-		encoder.Encode(errorResponse{fmt.Sprint(err)})
-	} else {
-		encoder.Encode(block)
-	}
+	block := blockchain.GetBlockchain().GetBlock(id)
+	json.NewEncoder(rw).Encode(block)
 
 }
 
-func jsonContentTypeMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		rw.Header().Add("Content-Type", "application/json")
-		next.ServeHTTP(rw, r)
-	})
-}
 func Start(aPort int) {
 	router := mux.NewRouter()
-	router.Use(jsonContentTypeMiddleware)
 	port = fmt.Sprintf(":%d", aPort)
 	router.HandleFunc("/", documentation).Methods("GET")
 	router.HandleFunc("/blocks", blocks).Methods("GET", "POST")
