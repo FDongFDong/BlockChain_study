@@ -1,8 +1,25 @@
 # BlockChain_study
 Go 언어로 블록체인 스터디
-- [DB에 저장된 블록 GET 메서드로 가져오기](#DB에-저장된-블록-GET-메서드로-가져오기)
-- [DB로 부터 저장된 블록 데이터 불러와 콘솔로 출력](#DB로부터-저장된-블록-데이터-불러와-콘솔로-출력)
-- [RESTful Blockchain](#RESTful-동작시키기)
+
+- [BlockChain\_study](#blockchain_study)
+  - [Genesis Block 만들어보기](#genesis-block-만들어보기)
+  - [Genesis Block, Second Block, ... 만들어보기](#genesis-block-second-block--만들어보기)
+  - [Refactoring, Singleton](#refactoring-singleton)
+    - [block 추가 및 block 정보 가져오기](#block-추가-및-block-정보-가져오기)
+    - [Web Server 1](#web-server-1)
+- [os.Args 사용](#osargs-사용)
+  - [FlagSet 사용](#flagset-사용)
+  - [FlagSet 응용](#flagset-응용)
+- [DB 처리하기](#db-처리하기)
+  - [bolt.db 사용하기 1](#boltdb-사용하기-1)
+  - [bolt.db 사용하기 2](#boltdb-사용하기-2)
+  - [bolt.db 사용하기 3](#boltdb-사용하기-3)
+  - [bold db 확인하는 패키지](#bold-db-확인하는-패키지)
+  - [boltbrowser 사용](#boltbrowser-사용)
+  - [boltdbweb 사용](#boltdbweb-사용)
+  - [DB로부터 저장된 블록 데이터 불러와 콘솔로 출력](#db로부터-저장된-블록-데이터-불러와-콘솔로-출력)
+  - [DB에 저장된 블록 GET 메서드로 가져오기](#db에-저장된-블록-get-메서드로-가져오기)
+  - [RESTful 동작시키기](#restful-동작시키기)
 
 
 ## Genesis Block 만들어보기
@@ -43,6 +60,215 @@ Go 언어로 블록체인 스터디
 
 간단한 웹서버 만들기 
 
+# os.Args 사용
+
+- os.Args
+
+    ```go
+    var Args []string
+    ```
+
+    CLI에서 사용된 문자열 배열을 리턴합니다. 첫번째 인자는 실행프로그램의 이름
+
+- 소스 코드
+
+    ```go
+    package main
+    
+    import (
+     "fmt"
+     "os"
+    )
+    
+    func usage() {
+     fmt.Printf("Welcome to FDong Coin\n\n")
+     fmt.Printf("Please use the following commands:\n\n")
+     fmt.Printf("explorer:   Start the HTML Explorer\n")
+     fmt.Printf("rest:   Start the REST API (recommende)\n")
+     os.Exit(0)
+    }
+    
+    func main() {
+    
+     if len(os.Args) < 2 {
+      usage()
+     }
+    
+     switch os.Args[1] {
+     case "explorer":
+      fmt.Println("Start Explorer")
+     case "rest":
+      fmt.Println("Start REST API")
+     default:
+      usage()
+     }
+    }
+    ```
+
+- 실행 결과
+  - go run main.go 입력 시
+
+    ```go
+    > go run main.go     
+    Welcome to FDong Coin
+    
+    Please use the following commands:
+    
+    explorer:               Start the HTML Explorer
+    rest:                   Start the REST API (recommende)
+    ```
+
+  - go run main.go explorer 입력 시
+
+    ```go
+    > go run main.go explorer
+    Start Explorer
+    ```
+
+  - go run main.go rest 입력 시
+
+    ```go
+    > go run main.go rest    
+    Start REST API
+    ```
+
+---
+
+## FlagSet 사용
+
+- Flag를 여러개 사용할 때 쓰기 좋다
+- 소스 코드
+
+    ```go
+    package main
+    
+    import (
+     "flag"
+     "fmt"
+     "os"
+    )
+    
+    func usage() {
+     fmt.Printf("Welcome to FDong Coin\n\n")
+     fmt.Printf("Please use the following commands:\n\n")
+     fmt.Printf("explorer:   Start the HTML Explorer\n")
+     fmt.Printf("rest:   Start the REST API (recommende)\n")
+     os.Exit(0)
+    }
+    
+    func main() {
+     // FlagSet은 go에게 어떤 command가 어떤 flag를 가질 것인지 알려주는 역할을 한다.
+    
+     if len(os.Args) < 2 {
+      usage()
+     }
+    
+     rest := flag.NewFlagSet("rest", flag.ExitOnError)
+     portFlag := rest.Int("port", 4000, "Sets the port of the server")
+    
+     switch os.Args[1] {
+     case "explorer":
+      fmt.Println("Start Explorer")
+     case "rest":
+      rest.Parse(os.Args[2:])
+     default:
+      usage()
+     }
+     if rest.Parsed() {
+      fmt.Println(*portFlag)
+      fmt.Println("Start Server")
+     }
+    
+    }
+    ```
+
+---
+
+## FlagSet 응용
+
+- 소스 코드
+  - main.go
+
+        ```go
+        package main
+        
+        import "coin/exam23/cli"
+        
+        func main() {
+         cli.Start()
+        }
+        ```
+
+  - cli/cli.go
+
+        ```go
+        package cli
+        
+        import (
+         "coin/exam23/explorer"
+         "coin/exam23/rest"
+         "flag"
+         "fmt"
+         "os"
+        )
+        
+        func usage() {
+         fmt.Printf("Welcome to FDong Coin\n\n")
+         fmt.Printf("Please use the following flags:\n\n")
+         fmt.Printf("-port:   Set the PORT of the server\n")
+         fmt.Printf("-mode:   Choose between 'html' and 'rest'\n")
+         os.Exit(0)
+        }
+        func Start() {
+         if len(os.Args) == 1 {
+          usage()
+         }
+        
+         port := flag.Int("port", 4000, "Set port of the server")
+         mode := flag.String("mode", "rest", "Choose between 'html' and 'rest'")
+         flag.Parse()
+        
+         switch *mode {
+         case "rest":
+          // start rest api
+          rest.Start(*port)
+         case "html":
+          // start html explorer
+          explorer.Start(*port)
+         default:
+          usage()
+         }
+        }
+        ```
+
+- 실행 결과
+  - go run main.go -mode=rest -port=2000
+
+        ```go
+        > go run main.go -mode=rest -port=2000
+        Listening on http://localhost:2000
+        ```
+
+  - go run main.go -mode=html -port=8000
+
+        ```go
+        > go run main.go -mode=html -port=8000
+        Listening on http://localhost8000
+        ```
+
+  - 잘못된 flag
+
+        ```go
+        > go run main.go -mode=html -port=asdf
+        invalid value "asdf" for flag -port: parse error
+        Usage of /var/folders/5s/13x9ywys5wz_w321jgl_f_pw0000gn/T/go-build895749235/b001/exe/main:
+          -mode string
+                Choose between 'html' and 'rest' (default "rest")
+          -port int
+                Set port of the server (default 4000)
+        exit status 2
+        ```
+---
 # DB 처리하기
 
 --- 
