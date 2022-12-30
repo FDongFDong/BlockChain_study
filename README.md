@@ -1,7 +1,7 @@
 # BlockChain_study
 Go 언어로 블록체인 스터디
 
-- [RESTful Blockchain](#RESTful 동작시키기)
+- [RESTful Blockchain](#RESTful-동작시키기)
 
 
 ## Genesis Block 만들어보기
