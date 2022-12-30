@@ -42,8 +42,406 @@ Go 언어로 블록체인 스터디
 블록체인 <-> 백엔드 서버를 위한 빌드업 
 
 간단한 웹서버 만들기 
-___
 
+# DB 처리하기
+
+--- 
+## bolt.db 사용하기 1
+
+[https://github.com/boltdb/bolt](https://github.com/boltdb/bolt)
+
+bolt db는 Key/Value 형태의 저장소이다.
+
+- bolt.db 설치하기
+    
+    ```go
+    go get github.com/boltdb/bolt
+    ```
+    
+- 소스 코드
+    - db/db.go
+        
+        ```go
+        package db
+        
+        import (
+        	"coin/exam24/utils"
+        
+        	"github.com/boltdb/bolt"
+        )
+        
+        const (
+        	dbname       = "blockchain.db"
+        	dataBucket   = "data"
+        	blocksBucket = "blocks"
+        )
+        
+        var db *bolt.DB
+        
+        // DB initialize, Singleton pattern형식
+        func DB() *bolt.DB {
+        	if db == nil {
+        		// init db
+        		// path는 DB의 이름, 파일이 없으면 자동으로 생성해준다,
+        		dbPointer, err := bolt.Open(dbname, 0600, nil)
+        		utils.HandleErr(err)
+        		db = dbPointer
+        		// bucket이 존재하지 않으면 생성시켜주는 Transaction, 두개의 bucket을 만들어준다.
+        		// bucket는 table 같은거다
+        		err = db.Update(func(tx *bolt.Tx) error {
+        			_, err := tx.CreateBucketIfNotExists([]byte(dataBucket))
+        			utils.HandleErr(err)
+        			_, err = tx.CreateBucketIfNotExists([]byte(blocksBucket))
+        
+        			return err
+        		})
+        		utils.HandleErr(err)
+        	}
+        	return db
+        }
+        ```
+        
+
+---
+
+## bolt.db 사용하기 2
+
+- block 데이터 저장하기
+- 소스 코드
+    - main.go
+        
+        ```go
+        package main
+        
+        import (
+        	"coin/exam26/blockchain"
+        )
+        
+        func main() {
+        	blockchain.Blockchain()
+        }
+        ```
+        
+    - db/db.go
+        
+        ```go
+        package db
+        
+        import (
+        	"coin/exam26/utils"
+        	"fmt"
+        
+        	"github.com/boltdb/bolt"
+        )
+        
+        const (
+        	dbname       = "blockchain.db"
+        	dataBucket   = "data"
+        	blocksBucket = "blocks"
+        )
+        
+        var db *bolt.DB
+        
+        // DB initialize, Singleton pattern형식
+        func DB() *bolt.DB {
+        	if db == nil {
+        		// init db
+        		// path는 DB의 이름, 파일이 없으면 자동으로 생성해준다,
+        		dbPointer, err := bolt.Open(dbname, 0600, nil)
+        		utils.HandleErr(err)
+        		db = dbPointer
+        		// bucket이 존재하지 않으면 생성시켜주는 Transaction, 두개의 bucket을 만들어준다.
+        		// bucket는 table 같은거다
+        		err = db.Update(func(tx *bolt.Tx) error {
+        			_, err := tx.CreateBucketIfNotExists([]byte(dataBucket))
+        			utils.HandleErr(err)
+        			_, err = tx.CreateBucketIfNotExists([]byte(blocksBucket))
+        
+        			return err
+        		})
+        		utils.HandleErr(err)
+        	}
+        	return db
+        }
+        
+        func SaveBlock(hash string, data []byte) {
+        	fmt.Printf("Saving Block %s\nData: %b", hash, data)
+        	err := DB().Update(func(tx *bolt.Tx) error {
+        		bucket := tx.Bucket([]byte(blocksBucket))
+        		err := bucket.Put([]byte(hash), data)
+        		return err
+        	})
+        	utils.HandleErr(err)
+        }
+        func SaveBlockchain(data []byte) {
+        	err := DB().Update(func(tx *bolt.Tx) error {
+        		bucket := tx.Bucket([]byte(dataBucket))
+        		err := bucket.Put([]byte("checkpoint"), data)
+        		return err
+        	})
+        	utils.HandleErr(err)
+        }
+        ```
+        
+    - blockchain/block.go
+        
+        ```go
+        package blockchain
+        
+        import (
+        	"bytes"
+        	"coin/exam26/db"
+        	"coin/exam26/utils"
+        	"crypto/sha256"
+        	"encoding/gob"
+        	"fmt"
+        )
+        
+        type Block struct {
+        	Data     string `json:"data"`
+        	Hash     string `json:"hash"`
+        	PrevHash string `json:"prevhash,omitempty"`
+        	Height   int    `json:"height"`
+        }
+        
+        func (b *Block) toBytes() []byte {
+        	var blockBuffer bytes.Buffer
+        	encoder := gob.NewEncoder(&blockBuffer)
+        	utils.HandleErr(encoder.Encode(b))
+        	return blockBuffer.Bytes()
+        }
+        
+        func (b *Block) persist() {
+        	db.SaveBlock(b.Hash, b.toBytes())
+        }
+        func createBlock(data string, prevHash string, height int) *Block {
+        	block := &Block{
+        		Data:     data,
+        		Hash:     "",
+        		PrevHash: prevHash,
+        		Height:   height,
+        	}
+        	payload := block.Data + block.PrevHash + fmt.Sprint(block.Height)
+        	block.Hash = fmt.Sprintf("%x", sha256.Sum256([]byte(payload)))
+        	block.persist()
+        	return block
+        }
+        ```
+        
+    - blockchain/chain.go
+        
+        ```go
+        package blockchain
+        
+        import (
+        	"sync"
+        )
+        
+        type blockchain struct {
+        	NewestHash string `json:"newestHash"`
+        	Height     int    `json:"height"`
+        }
+        
+        var b *blockchain
+        
+        var once sync.Once
+        
+        // AddBlock receiver
+        func (b *blockchain) AddBlock(data string) {
+        	block := createBlock(data, b.NewestHash, b.Height)
+        	b.NewestHash = block.Hash
+        	b.Height = block.Height
+        }
+        
+        func Blockchain() *blockchain {
+        	if b == nil {
+        		once.Do(func() {
+        			b = &blockchain{"", 0}
+        			b.AddBlock("Genesis Block")
+        		})
+        	}
+        	return b
+        }
+        ```
+        
+- 실행 결과
+    
+    ```go
+    > go run main.go
+    Saving Block 8500b59bb5271135cd9bcbf0afd693028d76df3b9c7da58d412b13fc8a8f9394
+    Data: [111101 11111111 10000001 11 1 1 101 1000010 1101100 1101111 1100011 1101011 1 11111111 10000010 0 1 100 1 100 1000100 1100001 1110100 1100001 1 1100 0 1 100 1001000 1100001 1110011 1101000 1 1100 0 1 1000 1010000 1110010 1100101 1110110 1001000 1100001 1110011 1101000 1 1100 0 1 110 1001000 1100101 1101001 1100111 1101000 1110100 1 100 0 0 0 1010100 11111111 10000010 1 1101 1000111 1100101 1101110 1100101 1110011 1101001 1110011 100000 1000010 1101100 1101111 1100011 1101011 1 1000000 111000 110101 110000 110000 1100010 110101 111001 1100010 1100010 110101 110010 110111 110001 110001 110011 110101 1100011 1100100 111001 1100010 1100011 1100010 1100110 110000 1100001 1100110 1100100 110110 111001 110011 110000 110010 111000 1100100 110111 110110 1100100 1100110 110011 1100010 111001 1100011 110111 1100100 1100001 110101 111000 1100100 110100 110001 110010 1100010 110001 110011 1100110 1100011 111000 1100001 111000 1100110 111001 110011 111001 110100 0]
+    ```
+    
+---
+## bolt.db 사용하기 3
+
+- block 데이터 저장하기
+- chain 데이터 저장하기
+- []byte로 만들어주는 유틸 함수만들기
+- 소스 코드
+    - blockchain/chain.go
+        
+        ```go
+        package blockchain
+        
+        import (
+        	"coin/exam27/db"
+        	"coin/exam27/utils"
+        	"sync"
+        )
+        
+        type blockchain struct {
+        	NewestHash string `json:"newestHash"`
+        	Height     int    `json:"height"`
+        }
+        
+        var b *blockchain
+        
+        var once sync.Once
+        
+        func (b *blockchain) persist() {
+        	db.SaveBlockchain(utils.ToBytes(b))
+        }
+        
+        // AddBlock receiver
+        func (b *blockchain) AddBlock(data string) {
+        	block := createBlock(data, b.NewestHash, b.Height+1)
+        	b.NewestHash = block.Hash
+        	b.Height = block.Height
+        	b.persist()
+        }
+        
+        func Blockchain() *blockchain {
+        	if b == nil {
+        		once.Do(func() {
+        			b = &blockchain{"", 0}
+        			b.AddBlock("Genesis Block")
+        		})
+        	}
+        	return b
+        }
+        ```
+        
+    - blockchain/block.go
+        
+        ```go
+        package blockchain
+        
+        import (
+        	"coin/exam27/db"
+        	"coin/exam27/utils"
+        	"crypto/sha256"
+        	"fmt"
+        )
+        
+        type Block struct {
+        	Data     string `json:"data"`
+        	Hash     string `json:"hash"`
+        	PrevHash string `json:"prevhash,omitempty"`
+        	Height   int    `json:"height"`
+        }
+        
+        func (b *Block) persist() {
+        	db.SaveBlock(b.Hash, utils.ToBytes(b))
+        }
+        func createBlock(data string, prevHash string, height int) *Block {
+        	block := &Block{
+        		Data:     data,
+        		Hash:     "",
+        		PrevHash: prevHash,
+        		Height:   height,
+        	}
+        	payload := block.Data + block.PrevHash + fmt.Sprint(block.Height)
+        	block.Hash = fmt.Sprintf("%x", sha256.Sum256([]byte(payload)))
+        	block.persist()
+        	return block
+        }
+        ```
+        
+    - uitls/utils.go
+        
+        ```go
+        package utils
+        
+        import (
+        	"bytes"
+        	"encoding/gob"
+        	"log"
+        )
+        
+        func HandleErr(err error) {
+        	if err != nil {
+        		log.Panic(err)
+        	}
+        }
+        
+        // 원하는 건 모든지 받을 수 있다.
+        func ToBytes(i interface{}) []byte {
+        	var aBuffer bytes.Buffer
+        	encoder := gob.NewEncoder(&aBuffer)
+        	HandleErr(encoder.Encode(i))
+        	return aBuffer.Bytes()
+        }
+        ```
+        
+---
+
+## bold db 확인하는 패키지
+
+- bolt.db로 생성한 db파일이 있어야한다.
+---
+
+## boltbrowser 사용
+
+[boltbrowser](https://pkg.go.dev/github.com/br0xen/boltbrowser@v0.0.0-20210531150353-7f10a81cece0#section-readme)
+
+- 설치
+    
+    ```go
+    go get github.com/br0xen/boltbrowser
+    ```
+    
+- 사용 방법
+    
+    ```go
+    boltbrowser <filename>
+    ```
+    
+- 실행 결과
+    - 터미널에 boltbrowser “dbname”
+        
+        ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/df741855-b08f-4f91-9750-7bbd74ada7ec/Untitled.png)
+        
+        ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/b6aa90f6-372b-4b79-973f-ddefa4b4b237/Untitled.png)
+---
+
+## boltdbweb 사용
+
+[](https://pkg.go.dev/github.com/evnix/boltdbweb@v0.0.0-20191029203843-5b16e6623bd9)
+
+[GitHub - evnix/boltdbweb: A web based GUI for BoltDB files](https://github.com/evnix/boltdbweb)
+
+- 설치
+    
+    ```go
+    go get github.com/evnix/boltdbweb
+    ```
+    
+- 사용 방법
+    
+    ```go
+    boltdbweb --db-name=<DBfilename>
+    ```
+    
+- 실행 결과
+    
+    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d01cf690-783c-4ca6-b677-9ac78f47b739/Untitled.png)
+    
+    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/06edadd3-c649-453a-8fef-beb52aca3149/Untitled.png)
+    
+    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/810d5214-5de1-446a-98b3-0e1bcd25c587/Untitled.png)
+    
+___
 
 ## DB로부터 저장된 블록 데이터 불러와 콘솔로 출력
 
