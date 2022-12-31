@@ -1,8 +1,7 @@
 package rest
 
 import (
-	"coin/exam35/blockchain"
-	"coin/exam35/utils"
+	"coin/exam36/blockchain"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -29,10 +28,6 @@ type urlDescription struct {
 
 type errorResponse struct {
 	ErrorMessage string `json:"errorMessage"`
-}
-
-type addBlockBody struct {
-	Message string `json:"message"`
 }
 
 func (u urlDescription) String() string {
@@ -74,14 +69,9 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 func blocks(rw http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-
 		json.NewEncoder(rw).Encode(blockchain.Blockchain().Blocks())
 	case "POST":
-
-		var addBlockBody addBlockBody
-
-		utils.HandleErr(json.NewDecoder(r.Body).Decode(&addBlockBody))
-		blockchain.Blockchain().AddBlock(addBlockBody.Message)
+		blockchain.Blockchain().AddBlock()
 		rw.WriteHeader(http.StatusCreated)
 	}
 }

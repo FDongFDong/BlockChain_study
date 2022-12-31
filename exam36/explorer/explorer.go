@@ -1,7 +1,7 @@
 package explorer
 
 import (
-	"coin/exam35/blockchain"
+	"coin/exam36/blockchain"
 	"fmt"
 	"log"
 	"net/http"
@@ -28,10 +28,7 @@ func add(rw http.ResponseWriter, r *http.Request) {
 	case "GET":
 		templates.ExecuteTemplate(rw, "add", nil)
 	case "POST":
-		r.ParseForm()
-		data := r.FormValue("blockData")
-		fmt.Println(data)
-		blockchain.Blockchain().AddBlock(data)
+		blockchain.Blockchain().AddBlock()
 		http.Redirect(rw, r, "/", http.StatusPermanentRedirect)
 
 	}

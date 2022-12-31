@@ -1,8 +1,8 @@
 package blockchain
 
 import (
-	"coin/exam35/db"
-	"coin/exam35/utils"
+	"coin/exam36/db"
+	"coin/exam36/utils"
 	"sync"
 )
 
@@ -49,8 +49,8 @@ func (b *blockchain) Blocks() []*Block {
 	return blocks
 }
 
-func (b *blockchain) AddBlock(data string) {
-	block := createBlock(data, b.NewestHash, b.Height+1)
+func (b *blockchain) AddBlock() {
+	block := createBlock(b.NewestHash, b.Height+1)
 	b.NewestHash = block.Hash
 	b.Height = block.Height
 	b.CurrentDifficulty = block.Difficulty
@@ -95,17 +95,14 @@ func (b *blockchain) difficulty() int {
 func Blockchain() *blockchain {
 	if b == nil {
 		once.Do(func() {
-
 			b = &blockchain{
 				Height: 0,
 			}
-
 			checkpoint := db.Checkpoint()
 			if checkpoint == nil {
 				//없으면 initialize한다.
-				b.AddBlock("Genesis Block")
+				b.AddBlock()
 			} else {
-
 				b.restore(checkpoint)
 			}
 

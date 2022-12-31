@@ -42,6 +42,8 @@ Go 언어로 블록체인 스터디
   - [Defficulty 자동으로 수정되게 변경하기](#defficulty-자동으로-수정되게-변경하기)
     - [8분~ 12분 사이 5개 블록이 생성되는 것을 기준으로 코드 작성](#8분-12분-사이-5개-블록이-생성되는-것을-기준으로-코드-작성)
     - [시나리오 진행](#시나리오-진행)
+- [트랜잭션 구축](#트랜잭션-구축)
+  - [코인베이스에서 채굴자에게 코인을 주도록 만들고 트랜잭션에 기록하기](#코인베이스에서-채굴자에게-코인을-주도록-만들고-트랜잭션에-기록하기)
 
 
 ## Genesis Block 만들어보기
@@ -125,7 +127,7 @@ Go 언어로 블록체인 스터디
 - 소스 코드
   - main.go
 
-        ```
+      ```go
         package main
         
         import (
@@ -157,11 +159,11 @@ Go 언어로 블록체인 스터디
          // 에러가 있을때만 실행
          log.Fatal(http.ListenAndServe(port, nil))
         }
-        ```
+    ```
 
   - blockchain/blockchain.go
 
-        ```
+    ```go
         package blockchain
         
         import (
@@ -223,7 +225,7 @@ Go 언어로 블록체인 스터디
          return b.blocks
          // return GetBlockchain().blocks
         }
-        ```
+    ```
 
 - 실행 결과
 
@@ -239,7 +241,7 @@ Go 언어로 블록체인 스터디
 - 소스 코드
   - main.go
 
-        ```
+      ```go
         package main
         
         import (
@@ -269,11 +271,11 @@ Go 언어로 블록체인 스터디
          // 에러가 있을때만 실행
          log.Fatal(http.ListenAndServe(port, nil))
         }
-        ```
+      ```
 
   - blockchain/blockchain.go
 
-        ```go
+      ```go
         package blockchain
         
         import (
@@ -335,13 +337,13 @@ Go 언어로 블록체인 스터디
          return b.blocks
          // return GetBlockchain().blocks
         }
-        ```
+      ```
 
   - pages/add.gohtml
     - 다음에 진행
   - pages/home.gohtml
 
-        ```
+      ```html
         <!DOCTYPE html>
         <html lang="en">
           <head>
@@ -370,7 +372,7 @@ Go 언어로 블록체인 스터디
           </main>
           </body>
         </html>
-        ```
+      ```
 
   - partials/footer.html
     - 다음에 진행
@@ -391,7 +393,7 @@ Go 언어로 블록체인 스터디
 - 소스 코드
   - main.go
 
-        ```go
+      ```go
         package main
         
         import (
@@ -430,11 +432,11 @@ Go 언어로 블록체인 스터디
          // 에러가 있을때만 실행
          log.Fatal(http.ListenAndServe(port, nil))
         }
-        ```
+      ```
 
   - template/pages/add.gohtml
 
-        ```html
+      ```html
         {{define "add"}}
         <!DOCTYPE html>
         <html lang="en">
@@ -450,11 +452,11 @@ Go 언어로 블록체인 스터디
           </body>
         </html>
         {{end}}
-        ```
+      ```
 
   - template/pages/home.gohtml
 
-        ```
+      ```html
         {{define "home"}}
         <!DOCTYPE html>
         <html lang="en">
@@ -470,11 +472,11 @@ Go 언어로 블록체인 스터디
           </body>
         </html>
         {{end}}
-        ```
+      ```
 
   - template/partials/block.gohtml
 
-        ```
+      ```html
         {{define "Block"}}
               <div>
                 <ul>
@@ -487,19 +489,19 @@ Go 언어로 블록체인 스터디
               </div>
             <hr />
         {{end}}
-        ```
+      ```
 
   - template/partials/footer.gohtml
 
-        ```
+      ```html
         {{define "footer"}}
         <footer>&copy; 2022</footer>
         {{end}}
-        ```
+      ```
 
   - template/partials/head.gohtml
 
-        ```
+      ```html
         {{define "head"}}
           <head>
             <meta charset="UTF-8" />
@@ -509,11 +511,11 @@ Go 언어로 블록체인 스터디
             <title>Coin</title>
           </head>
           {{end}}
-        ```
+      ```
 
   - template/partials/header.gohtml
 
-        ```
+      ```html
         {{define "header"}}
         
         <header>
@@ -531,11 +533,9 @@ Go 언어로 블록체인 스터디
             <h1>{{.PageTitle}}</h1>
         </header>
         {{end}}
-        ```
+      ```
 
-- 실행 결과
 
-    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/ee956d65-8741-4f9b-8851-fcef7abf0b57/Untitled.png)
 
 ### Block 데이터 출력하기
 
@@ -545,7 +545,7 @@ Go 언어로 블록체인 스터디
 - 소스 코드
   - main.go
 
-        ```json
+      ```go
         package main
         
         import (
@@ -593,11 +593,11 @@ Go 언어로 블록체인 스터디
          fmt.Printf("Listening on http://localhost%s\n", port)
          log.Fatal(http.ListenAndServe(port, nil))
         }
-        ```
+      ```
 
   - add.gohtml
 
-        ```json
+      ```html
         {{define "add"}}
         <!DOCTYPE html>
         <html lang="en">
@@ -614,11 +614,11 @@ Go 언어로 블록체인 스터디
           </body>
         </html>
         {{end}}
-        ```
+      ```
 
   - home.gohtml
 
-        ```json
+      ```html
         {{define "home"}}
         <!DOCTYPE html>
         <html lang="en">
@@ -634,36 +634,15 @@ Go 언어로 블록체인 스터디
           </body>
         </html>
         {{end}}
-        ```
+      ```
 
-- 실행 결과
-  - 메인 화면
-    - Method : GET
-    - URL : /home
-    - 실행 화면
-
-            ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/27a2bfca-9fa3-4979-85b8-43f9d2ac9e06/Untitled.png)
-
-  - 블록 추가 화면
-    - Method : GET
-    - URL : /add
-    - 실행 화면
-
-            ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/fda29806-62b3-44ca-ad44-3d296dd3edc9/Untitled.png)
-
-    - Method : POST
-    - URL : /add
-    - 리다이렉션 : /home
-    - 실행 화면
-
-            ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/945e4289-4cc3-44c0-81b3-bcacf21c4fbe/Untitled.png)
 
 ### 앞서 만든 서버 Refactoring 하기
 
 - 소스 코드
   - main.go
 
-        ```go
+      ```go
         package main
         
         import (
@@ -673,11 +652,11 @@ Go 언어로 블록체인 스터디
         func main() {
          explorer.Start()
         }
-        ```
+      ```
 
   - explorer.go
 
-        ```go
+      ```go
         package explorer
         
         import (
@@ -727,11 +706,11 @@ Go 언어로 블록체인 스터디
          fmt.Printf("Listening on http://localhost%s\n", port)
          log.Fatal(http.ListenAndServe(port, nil))
         }
-        ```
+      ```
 
   - block.gohtml
 
-        ```go
+      ```html
         {{define "block"}}
          <div>
             <ul>
@@ -744,11 +723,7 @@ Go 언어로 블록체인 스터디
             </div>
             <hr />
         {{end}}
-        ```
-
-- 실행 결과
-
-    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d24eb07a-e1c5-4bbb-8fda-4483b0e24865/Untitled.png)
+      ```
 
 ---
 
@@ -758,7 +733,7 @@ Go 언어로 블록체인 스터디
 - 소스 코드
   - main.go
 
-        ```go
+      ```go
         package main
         
         import (
@@ -797,7 +772,7 @@ Go 언어로 블록체인 스터디
          fmt.Printf("Listening on http://localhost%s\n", port)
          log.Fatal(http.ListenAndServe(port, nil))
         }
-        ```
+      ```
 
 ### Struct 다루기 2
 
@@ -806,7 +781,7 @@ Go 언어로 블록체인 스터디
 - 소스 코드
   - main.go
 
-        ```go
+      ```go
         package main
         
         import (
@@ -861,11 +836,8 @@ Go 언어로 블록체인 스터디
          fmt.Printf("Listening on http://localhost%s\n", port)
          log.Fatal(http.ListenAndServe(port, nil))
         }
-        ```
+      ```
 
-- 실행 결과
-
-    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/09e788a5-7d19-4073-ab26-2ad5e4b29c31/Untitled.png)
 
 ---
 
@@ -877,7 +849,7 @@ Go 언어로 블록체인 스터디
 - 소스 코드
   - main.go
 
-        ```go
+      ```go
         package main
         
         import (
@@ -942,11 +914,8 @@ Go 언어로 블록체인 스터디
         
          log.Fatal(http.ListenAndServe(port, nil))
         }
-        ```
+      ```
 
-- 실행 결과
-
-    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/43b0c891-2cdf-4d50-b46d-c98773dd2e7e/Untitled.png)
 
 ---
 
@@ -959,7 +928,7 @@ Go 언어로 블록체인 스터디
 - 소스 코드
   - main.go
 
-    ```go
+  ```go
     package main
     
     import (
@@ -1043,14 +1012,14 @@ Go 언어로 블록체인 스터디
      fmt.Printf("Listening on http://localhost%s\n", port)
      log.Fatal(http.ListenAndServe(port, nil))
     }
-    ```
+  ```
 
 - 실행 결과
   - 모든 블록 가져오기
   - GET
   - URL : /blocks
 
-    ```go
+  ```json
     HTTP/1.1 200 OK
     Content-Type: application/json
     Date: Wed, 28 Dec 2022 04:34:24 GMT
@@ -1064,24 +1033,24 @@ Go 언어로 블록체인 스터디
         "PrevHash": ""
       }
     ]
-    ```
+  ```
 
   - 블록 생성 및 추가하기
   - POST
   - URL : /blocks
 
-        ```go
+      ```json
         HTTP/1.1 201 Created
         Date: Wed, 28 Dec 2022 04:34:51 GMT
         Content-Length: 0
         Connection: close
-        ```
+      ```
 
   - 추가된 블록 확인하기
   - GET
   - URL : /Blocks
 
-        ```go
+      ```json
         HTTP/1.1 200 OK
         Content-Type: application/json
         Date: Wed, 28 Dec 2022 04:35:43 GMT
@@ -1100,7 +1069,7 @@ Go 언어로 블록체인 스터디
             "PrevHash": "89eb0ac031a63d2421cd05a2fbe41f3ea35f5c3712ca839cbf6b85c4ee07b7a3"
           },
         ]
-        ```
+      ```
 
 ---
 
@@ -1110,7 +1079,7 @@ Go 언어로 블록체인 스터디
 - 소스 코드
   - main.go
 
-        ```go
+      ```go
         package main
         
         import (
@@ -1122,11 +1091,11 @@ Go 언어로 블록체인 스터디
          go explorer.Start(3000)
          rest.Start(4000)
         }
-        ```
+      ```
 
   - rest/rest.go
 
-        ```go
+      ```go
         package rest
         
         import (
@@ -1212,11 +1181,11 @@ Go 언어로 블록체인 스터디
          fmt.Printf("Listening on http://localhost%s\n", port)
          log.Fatal(http.ListenAndServe(port, handler))
         }
-        ```
+      ```
 
   - erplorer/explorer.go
 
-        ```go
+      ```go
         package explorer
         
         import (
@@ -1264,7 +1233,7 @@ Go 언어로 블록체인 스터디
          fmt.Printf("Listening on http://localhost%d\n", port)
          log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), handle))
         }
-        ```
+      ```
 
 ---
 
@@ -1275,7 +1244,7 @@ Go 언어로 블록체인 스터디
 - 소스 코드
   - main.go
 
-        ```go
+      ```go
         package main
         
         import (
@@ -1286,11 +1255,11 @@ Go 언어로 블록체인 스터디
         
          rest.Start(4000)
         }
-        ```
+      ```
 
   - rest.go
 
-        ```go
+      ```go
         package rest
         
         import (
@@ -1322,14 +1291,14 @@ Go 언어로 블록체인 스터디
          fmt.Printf("Listening on http://localhost%s\n", port)
          log.Fatal(http.ListenAndServe(port, router))
         }
-        ```
+      ```
 
 - 실행 결과
 
-    ```go
+  ```go
     Listening on http://localhost:4000
     map[id:1]
-    ```
+  ```
 
 ---
 
@@ -1338,7 +1307,7 @@ Go 언어로 블록체인 스터디
 - 소스 코드
   - main.go
 
-        ```go
+      ```go
         package main
         
         import (
@@ -1349,11 +1318,11 @@ Go 언어로 블록체인 스터디
         
          rest.Start(4000)
         }
-        ```
+      ```
 
   - rest/rest.go
 
-        ```go
+      ```go
         package rest
         
         import (
@@ -1400,11 +1369,11 @@ Go 언어로 블록체인 스터디
          fmt.Printf("Listening on http://localhost%s\n", port)
          log.Fatal(http.ListenAndServe(port, router))
         }
-        ```
+      ```
 
   - blockchain/blockchain.go
 
-        ```go
+      ```go
         package blockchain
         
         // 블록의 데이터에 height 값을 넣어준다.
@@ -1431,57 +1400,57 @@ Go 언어로 블록체인 스터디
         func (b *blockchain) GetBlock(height int) *Block {
          return b.blocks[height-1]
         }
-        ```
+      ```
 
 - 실행 결과
     1. 기존에 저장된 블록체인 정보를 가져온다.
 
-        ```go
-        [
-          {
-            "data": "Genesis Block",
-            "hash": "89eb0ac031a63d2421cd05a2fbe41f3ea35f5c3712ca839cbf6b85c4ee07b7a3",
-            "height": 1
-          }
-        ]
+        ```json
+            [
+              {
+                "data": "Genesis Block",
+                "hash": "89eb0ac031a63d2421cd05a2fbe41f3ea35f5c3712ca839cbf6b85c4ee07b7a3",
+                "height": 1
+              }
+            ]
         ```
 
     2. 하나의 블록을 생성한다.
 
-        ```go
-        HTTP/1.1 201 Created
-        Date: Wed, 28 Dec 2022 08:17:07 GMT
-        Content-Length: 0
-        Connection: close
+        ```json
+            HTTP/1.1 201 Created
+            Date: Wed, 28 Dec 2022 08:17:07 GMT
+            Content-Length: 0
+            Connection: close
         ```
 
     3. 생성된 블록을 확인한다.
 
-        ```go
-        [
-          {
-            "data": "Genesis Block",
-            "hash": "89eb0ac031a63d2421cd05a2fbe41f3ea35f5c3712ca839cbf6b85c4ee07b7a3",
-            "height": 1
-          },
-          {
-            "data": "Data for my block",
-            "hash": "6de940f3a7ead5008e358bdda0ac9b0234a4e8dbc94c31ca1dd91b8798607182",
-            "prevhash": "89eb0ac031a63d2421cd05a2fbe41f3ea35f5c3712ca839cbf6b85c4ee07b7a3",
-            "height": 2
-          }
-        ]
+        ```json
+            [
+              {
+                "data": "Genesis Block",
+                "hash": "89eb0ac031a63d2421cd05a2fbe41f3ea35f5c3712ca839cbf6b85c4ee07b7a3",
+                "height": 1
+              },
+              {
+                "data": "Data for my block",
+                "hash": "6de940f3a7ead5008e358bdda0ac9b0234a4e8dbc94c31ca1dd91b8798607182",
+                "prevhash": "89eb0ac031a63d2421cd05a2fbe41f3ea35f5c3712ca839cbf6b85c4ee07b7a3",
+                "height": 2
+              }
+            ]
         ```
 
     4. height가 2번인 블록의 정보를 가져온다
 
-        ```go
-        {
-          "data": "Data for my block",
-          "hash": "6de940f3a7ead5008e358bdda0ac9b0234a4e8dbc94c31ca1dd91b8798607182",
-          "prevhash": "89eb0ac031a63d2421cd05a2fbe41f3ea35f5c3712ca839cbf6b85c4ee07b7a3",
-          "height": 2
-        }
+        ```json
+            {
+              "data": "Data for my block",
+              "hash": "6de940f3a7ead5008e358bdda0ac9b0234a4e8dbc94c31ca1dd91b8798607182",
+              "prevhash": "89eb0ac031a63d2421cd05a2fbe41f3ea35f5c3712ca839cbf6b85c4ee07b7a3",
+              "height": 2
+            }
         ```
 
 ---
@@ -1745,7 +1714,7 @@ ___
 
   - cli/cli.go
 
-        ```go
+      ```go
         package cli
         
         import (
@@ -1783,26 +1752,26 @@ ___
           usage()
          }
         }
-        ```
+      ```
 
 - 실행 결과
   - go run main.go -mode=rest -port=2000
 
-        ```go
-        > go run main.go -mode=rest -port=2000
-        Listening on http://localhost:2000
-        ```
+    ```shell
+      > go run main.go -mode=rest -port=2000
+      Listening on http://localhost:2000
+    ```
 
   - go run main.go -mode=html -port=8000
 
-        ```go
+      ```shell
         > go run main.go -mode=html -port=8000
         Listening on http://localhost8000
-        ```
+      ```
 
   - 잘못된 flag
 
-        ```go
+      ```shell
         > go run main.go -mode=html -port=asdf
         invalid value "asdf" for flag -port: parse error
         Usage of /var/folders/5s/13x9ywys5wz_w321jgl_f_pw0000gn/T/go-build895749235/b001/exe/main:
@@ -1811,7 +1780,7 @@ ___
           -port int
                 Set port of the server (default 4000)
         exit status 2
-        ```
+      ```
 ---
 # DB 처리하기
 
@@ -1824,51 +1793,51 @@ bolt db는 Key/Value 형태의 저장소이다.
 
 - bolt.db 설치하기
     
-    ```go
+  ```go
     go get github.com/boltdb/bolt
-    ```
+  ```
     
 - 소스 코드
     - db/db.go
         
         ```go
-        package db
-        
-        import (
-        	"coin/exam24/utils"
-        
-        	"github.com/boltdb/bolt"
-        )
-        
-        const (
-        	dbname       = "blockchain.db"
-        	dataBucket   = "data"
-        	blocksBucket = "blocks"
-        )
-        
-        var db *bolt.DB
-        
-        // DB initialize, Singleton pattern형식
-        func DB() *bolt.DB {
-        	if db == nil {
-        		// init db
-        		// path는 DB의 이름, 파일이 없으면 자동으로 생성해준다,
-        		dbPointer, err := bolt.Open(dbname, 0600, nil)
-        		utils.HandleErr(err)
-        		db = dbPointer
-        		// bucket이 존재하지 않으면 생성시켜주는 Transaction, 두개의 bucket을 만들어준다.
-        		// bucket는 table 같은거다
-        		err = db.Update(func(tx *bolt.Tx) error {
-        			_, err := tx.CreateBucketIfNotExists([]byte(dataBucket))
-        			utils.HandleErr(err)
-        			_, err = tx.CreateBucketIfNotExists([]byte(blocksBucket))
-        
-        			return err
-        		})
-        		utils.HandleErr(err)
-        	}
-        	return db
-        }
+          package db
+          
+          import (
+            "coin/exam24/utils"
+          
+            "github.com/boltdb/bolt"
+          )
+          
+          const (
+            dbname       = "blockchain.db"
+            dataBucket   = "data"
+            blocksBucket = "blocks"
+          )
+          
+          var db *bolt.DB
+          
+          // DB initialize, Singleton pattern형식
+          func DB() *bolt.DB {
+            if db == nil {
+              // init db
+              // path는 DB의 이름, 파일이 없으면 자동으로 생성해준다,
+              dbPointer, err := bolt.Open(dbname, 0600, nil)
+              utils.HandleErr(err)
+              db = dbPointer
+              // bucket이 존재하지 않으면 생성시켜주는 Transaction, 두개의 bucket을 만들어준다.
+              // bucket는 table 같은거다
+              err = db.Update(func(tx *bolt.Tx) error {
+                _, err := tx.CreateBucketIfNotExists([]byte(dataBucket))
+                utils.HandleErr(err)
+                _, err = tx.CreateBucketIfNotExists([]byte(blocksBucket))
+          
+                return err
+              })
+              utils.HandleErr(err)
+            }
+            return db
+          }
         ```
         
 
@@ -1881,76 +1850,76 @@ bolt db는 Key/Value 형태의 저장소이다.
     - main.go
         
         ```go
-        package main
-        
-        import (
-        	"coin/exam26/blockchain"
-        )
-        
-        func main() {
-        	blockchain.Blockchain()
-        }
-        ```
-        
-    - db/db.go
-        
-        ```go
-        package db
-        
-        import (
-        	"coin/exam26/utils"
-        	"fmt"
-        
-        	"github.com/boltdb/bolt"
-        )
-        
-        const (
-        	dbname       = "blockchain.db"
-        	dataBucket   = "data"
-        	blocksBucket = "blocks"
-        )
-        
-        var db *bolt.DB
-        
-        // DB initialize, Singleton pattern형식
-        func DB() *bolt.DB {
-        	if db == nil {
-        		// init db
-        		// path는 DB의 이름, 파일이 없으면 자동으로 생성해준다,
-        		dbPointer, err := bolt.Open(dbname, 0600, nil)
-        		utils.HandleErr(err)
-        		db = dbPointer
-        		// bucket이 존재하지 않으면 생성시켜주는 Transaction, 두개의 bucket을 만들어준다.
-        		// bucket는 table 같은거다
-        		err = db.Update(func(tx *bolt.Tx) error {
-        			_, err := tx.CreateBucketIfNotExists([]byte(dataBucket))
-        			utils.HandleErr(err)
-        			_, err = tx.CreateBucketIfNotExists([]byte(blocksBucket))
-        
-        			return err
-        		})
-        		utils.HandleErr(err)
-        	}
-        	return db
-        }
-        
-        func SaveBlock(hash string, data []byte) {
-        	fmt.Printf("Saving Block %s\nData: %b", hash, data)
-        	err := DB().Update(func(tx *bolt.Tx) error {
-        		bucket := tx.Bucket([]byte(blocksBucket))
-        		err := bucket.Put([]byte(hash), data)
-        		return err
-        	})
-        	utils.HandleErr(err)
-        }
-        func SaveBlockchain(data []byte) {
-        	err := DB().Update(func(tx *bolt.Tx) error {
-        		bucket := tx.Bucket([]byte(dataBucket))
-        		err := bucket.Put([]byte("checkpoint"), data)
-        		return err
-        	})
-        	utils.HandleErr(err)
-        }
+          package main
+          
+          import (
+            "coin/exam26/blockchain"
+          )
+          
+          func main() {
+            blockchain.Blockchain()
+          }
+          ```
+          
+      - db/db.go
+          
+          ```go
+          package db
+          
+          import (
+            "coin/exam26/utils"
+            "fmt"
+          
+            "github.com/boltdb/bolt"
+          )
+          
+          const (
+            dbname       = "blockchain.db"
+            dataBucket   = "data"
+            blocksBucket = "blocks"
+          )
+          
+          var db *bolt.DB
+          
+          // DB initialize, Singleton pattern형식
+          func DB() *bolt.DB {
+            if db == nil {
+              // init db
+              // path는 DB의 이름, 파일이 없으면 자동으로 생성해준다,
+              dbPointer, err := bolt.Open(dbname, 0600, nil)
+              utils.HandleErr(err)
+              db = dbPointer
+              // bucket이 존재하지 않으면 생성시켜주는 Transaction, 두개의 bucket을 만들어준다.
+              // bucket는 table 같은거다
+              err = db.Update(func(tx *bolt.Tx) error {
+                _, err := tx.CreateBucketIfNotExists([]byte(dataBucket))
+                utils.HandleErr(err)
+                _, err = tx.CreateBucketIfNotExists([]byte(blocksBucket))
+          
+                return err
+              })
+              utils.HandleErr(err)
+            }
+            return db
+          }
+          
+          func SaveBlock(hash string, data []byte) {
+            fmt.Printf("Saving Block %s\nData: %b", hash, data)
+            err := DB().Update(func(tx *bolt.Tx) error {
+              bucket := tx.Bucket([]byte(blocksBucket))
+              err := bucket.Put([]byte(hash), data)
+              return err
+            })
+            utils.HandleErr(err)
+          }
+          func SaveBlockchain(data []byte) {
+            err := DB().Update(func(tx *bolt.Tx) error {
+              bucket := tx.Bucket([]byte(dataBucket))
+              err := bucket.Put([]byte("checkpoint"), data)
+              return err
+            })
+            utils.HandleErr(err)
+          }
         ```
         
     - blockchain/block.go
@@ -2001,45 +1970,45 @@ bolt db는 Key/Value 형태의 저장소이다.
     - blockchain/chain.go
         
         ```go
-        package blockchain
-        
-        import (
-        	"sync"
-        )
-        
-        type blockchain struct {
-        	NewestHash string `json:"newestHash"`
-        	Height     int    `json:"height"`
-        }
-        
-        var b *blockchain
-        
-        var once sync.Once
-        
-        // AddBlock receiver
-        func (b *blockchain) AddBlock(data string) {
-        	block := createBlock(data, b.NewestHash, b.Height)
-        	b.NewestHash = block.Hash
-        	b.Height = block.Height
-        }
-        
-        func Blockchain() *blockchain {
-        	if b == nil {
-        		once.Do(func() {
-        			b = &blockchain{"", 0}
-        			b.AddBlock("Genesis Block")
-        		})
-        	}
-        	return b
-        }
+          package blockchain
+          
+          import (
+            "sync"
+          )
+          
+          type blockchain struct {
+            NewestHash string `json:"newestHash"`
+            Height     int    `json:"height"`
+          }
+          
+          var b *blockchain
+          
+          var once sync.Once
+          
+          // AddBlock receiver
+          func (b *blockchain) AddBlock(data string) {
+            block := createBlock(data, b.NewestHash, b.Height)
+            b.NewestHash = block.Hash
+            b.Height = block.Height
+          }
+          
+          func Blockchain() *blockchain {
+            if b == nil {
+              once.Do(func() {
+                b = &blockchain{"", 0}
+                b.AddBlock("Genesis Block")
+              })
+            }
+            return b
+          }
         ```
         
 - 실행 결과
     
-    ```go
-    > go run main.go
-    Saving Block 8500b59bb5271135cd9bcbf0afd693028d76df3b9c7da58d412b13fc8a8f9394
-    Data: [111101 11111111 10000001 11 1 1 101 1000010 1101100 1101111 1100011 1101011 1 11111111 10000010 0 1 100 1 100 1000100 1100001 1110100 1100001 1 1100 0 1 100 1001000 1100001 1110011 1101000 1 1100 0 1 1000 1010000 1110010 1100101 1110110 1001000 1100001 1110011 1101000 1 1100 0 1 110 1001000 1100101 1101001 1100111 1101000 1110100 1 100 0 0 0 1010100 11111111 10000010 1 1101 1000111 1100101 1101110 1100101 1110011 1101001 1110011 100000 1000010 1101100 1101111 1100011 1101011 1 1000000 111000 110101 110000 110000 1100010 110101 111001 1100010 1100010 110101 110010 110111 110001 110001 110011 110101 1100011 1100100 111001 1100010 1100011 1100010 1100110 110000 1100001 1100110 1100100 110110 111001 110011 110000 110010 111000 1100100 110111 110110 1100100 1100110 110011 1100010 111001 1100011 110111 1100100 1100001 110101 111000 1100100 110100 110001 110010 1100010 110001 110011 1100110 1100011 111000 1100001 111000 1100110 111001 110011 111001 110100 0]
+    ```shell
+      > go run main.go
+      Saving Block 8500b59bb5271135cd9bcbf0afd693028d76df3b9c7da58d412b13fc8a8f9394
+      Data: [111101 11111111 10000001 11 1 1 101 1000010 1101100 1101111 1100011 1101011 1 11111111 10000010 0 1 100 1 100 1000100 1100001 1110100 1100001 1 1100 0 1 100 1001000 1100001 1110011 1101000 1 1100 0 1 1000 1010000 1110010 1100101 1110110 1001000 1100001 1110011 1101000 1 1100 0 1 110 1001000 1100101 1101001 1100111 1101000 1110100 1 100 0 0 0 1010100 11111111 10000010 1 1101 1000111 1100101 1101110 1100101 1110011 1101001 1110011 100000 1000010 1101100 1101111 1100011 1101011 1 1000000 111000 110101 110000 110000 1100010 110101 111001 1100010 1100010 110101 110010 110111 110001 110001 110011 110101 1100011 1100100 111001 1100010 1100011 1100010 1100110 110000 1100001 1100110 1100100 110110 111001 110011 110000 110010 111000 1100100 110111 110110 1100100 1100110 110011 1100010 111001 1100011 110111 1100100 1100001 110101 111000 1100100 110100 110001 110010 1100010 110001 110011 1100110 1100011 111000 1100001 111000 1100110 111001 110011 111001 110100 0]
     ```
     
 ---
@@ -2052,97 +2021,97 @@ bolt db는 Key/Value 형태의 저장소이다.
     - blockchain/chain.go
         
         ```go
-        package blockchain
-        
-        import (
-        	"coin/exam27/db"
-        	"coin/exam27/utils"
-        	"sync"
-        )
-        
-        type blockchain struct {
-        	NewestHash string `json:"newestHash"`
-        	Height     int    `json:"height"`
-        }
-        
-        var b *blockchain
-        
-        var once sync.Once
-        
-        func (b *blockchain) persist() {
-        	db.SaveBlockchain(utils.ToBytes(b))
-        }
-        
-        // AddBlock receiver
-        func (b *blockchain) AddBlock(data string) {
-        	block := createBlock(data, b.NewestHash, b.Height+1)
-        	b.NewestHash = block.Hash
-        	b.Height = block.Height
-        	b.persist()
-        }
-        
-        func Blockchain() *blockchain {
-        	if b == nil {
-        		once.Do(func() {
-        			b = &blockchain{"", 0}
-        			b.AddBlock("Genesis Block")
-        		})
-        	}
-        	return b
-        }
+          package blockchain
+          
+          import (
+            "coin/exam27/db"
+            "coin/exam27/utils"
+            "sync"
+          )
+          
+          type blockchain struct {
+            NewestHash string `json:"newestHash"`
+            Height     int    `json:"height"`
+          }
+          
+          var b *blockchain
+          
+          var once sync.Once
+          
+          func (b *blockchain) persist() {
+            db.SaveBlockchain(utils.ToBytes(b))
+          }
+          
+          // AddBlock receiver
+          func (b *blockchain) AddBlock(data string) {
+            block := createBlock(data, b.NewestHash, b.Height+1)
+            b.NewestHash = block.Hash
+            b.Height = block.Height
+            b.persist()
+          }
+          
+          func Blockchain() *blockchain {
+            if b == nil {
+              once.Do(func() {
+                b = &blockchain{"", 0}
+                b.AddBlock("Genesis Block")
+              })
+            }
+            return b
+          }
         ```
         
     - blockchain/block.go
         
         ```go
-        package blockchain
-        
-        import (
-        	"coin/exam27/db"
-        	"coin/exam27/utils"
-        	"crypto/sha256"
-        	"fmt"
-        )
-        
-        type Block struct {
-        	Data     string `json:"data"`
-        	Hash     string `json:"hash"`
-        	PrevHash string `json:"prevhash,omitempty"`
-        	Height   int    `json:"height"`
-        }
-        
-        func (b *Block) persist() {
-        	db.SaveBlock(b.Hash, utils.ToBytes(b))
-        }
-        func createBlock(data string, prevHash string, height int) *Block {
-        	block := &Block{
-        		Data:     data,
-        		Hash:     "",
-        		PrevHash: prevHash,
-        		Height:   height,
-        	}
-        	payload := block.Data + block.PrevHash + fmt.Sprint(block.Height)
-        	block.Hash = fmt.Sprintf("%x", sha256.Sum256([]byte(payload)))
-        	block.persist()
-        	return block
-        }
+          package blockchain
+          
+          import (
+            "coin/exam27/db"
+            "coin/exam27/utils"
+            "crypto/sha256"
+            "fmt"
+          )
+          
+          type Block struct {
+            Data     string `json:"data"`
+            Hash     string `json:"hash"`
+            PrevHash string `json:"prevhash,omitempty"`
+            Height   int    `json:"height"`
+          }
+          
+          func (b *Block) persist() {
+            db.SaveBlock(b.Hash, utils.ToBytes(b))
+          }
+          func createBlock(data string, prevHash string, height int) *Block {
+            block := &Block{
+              Data:     data,
+              Hash:     "",
+              PrevHash: prevHash,
+              Height:   height,
+            }
+            payload := block.Data + block.PrevHash + fmt.Sprint(block.Height)
+            block.Hash = fmt.Sprintf("%x", sha256.Sum256([]byte(payload)))
+            block.persist()
+            return block
+          }
         ```
         
     - uitls/utils.go
         
         ```go
-        package utils
-        
-        import (
-        	"bytes"
-        	"encoding/gob"
-        	"log"
-        )
-        
-        func HandleErr(err error) {
-        	if err != nil {
-        		log.Panic(err)
-        	}
+          package utils
+          
+          import (
+            "bytes"
+            "encoding/gob"
+            "log"
+          )
+          
+          func HandleErr(err error) {
+            if err != nil {
+              log.Panic(err)
+            }
         }
         
         // 원하는 건 모든지 받을 수 있다.
@@ -2168,22 +2137,16 @@ bolt db는 Key/Value 형태의 저장소이다.
 - 설치
     
     ```go
-    go get github.com/br0xen/boltbrowser
+       go get github.com/br0xen/boltbrowser
     ```
     
 - 사용 방법
     
     ```go
-    boltbrowser <filename>
+        boltbrowser <filename>
     ```
     
-- 실행 결과
-    - 터미널에 boltbrowser “dbname”
-        
-        ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/df741855-b08f-4f91-9750-7bbd74ada7ec/Untitled.png)
-        
-        ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/b6aa90f6-372b-4b79-973f-ddefa4b4b237/Untitled.png)
----
+
 
 ## boltdbweb 사용
 
@@ -2581,18 +2544,18 @@ ___
 - 시간의 흐름에 따라 Difficulty 값을 바뀌도록 한다.
 - Ex
 
-    ```json
-    package main
-    
-    import (
-     "crypto/sha256"
-     "fmt"
-    )
-    
-    func main() {
-     hash := sha256.Sum256([]byte("hello"))
-     fmt.Printf("%x\n", hash)
-    }
+    ```go
+      package main
+      
+      import (
+      "crypto/sha256"
+      "fmt"
+      )
+      
+      func main() {
+      hash := sha256.Sum256([]byte("hello"))
+      fmt.Printf("%x\n", hash)
+      }
     ```
 
     해당 문자열로 만든 해시값은 앞에 0이 하나도 없다.
@@ -2604,34 +2567,34 @@ ___
   - Data는 유저가 보내주는 것이라 수정할 수 없다.
 - Nonce 값은 채굴자가 변경할 수 있는 유일한 값이다.
   - Nonce값을 변경해가며 해시값을 조건에 맞게 찾아내야한다.
-
-        ```json
+  
+      ```go
         func main() {
-         hash := sha256.Sum256([]byte("hello1"))
-         fmt.Printf("%x\n", hash)
+          hash := sha256.Sum256([]byte("hello1"))
+          fmt.Printf("%x\n", hash)
         }
-        ```
+       ```
 
-        ```json
+       ```go
         func main() {
-         hash := sha256.Sum256([]byte("hello2"))
-         fmt.Printf("%x\n", hash)
+           hash := sha256.Sum256([]byte("hello2"))
+           fmt.Printf("%x\n", hash)
         }
-        ```
+       ```
 
-        ```json
+      ```go
         func main() {
-         hash := sha256.Sum256([]byte("hello3"))
-         fmt.Printf("%x\n", hash)
+          hash := sha256.Sum256([]byte("hello3"))
+          fmt.Printf("%x\n", hash)
         }
-        ```
+       ```
 
-        ```json
+      ```go
         func main() {
-         hash := sha256.Sum256([]byte("hello4"))
-         fmt.Printf("%x\n", hash)
+          hash := sha256.Sum256([]byte("hello4"))
+          fmt.Printf("%x\n", hash)
         }
-        ```
+      ```
 
     - 못찾았다.
 
@@ -2644,7 +2607,7 @@ ___
 - 소스 코드
   - main.go
 
-        ```json
+      ```go
         package main
         
         import (
@@ -2671,35 +2634,33 @@ ___
          }
         
         }
-        ```
+       ```
 
 - 실행 결과
   - difficulty가 2일 때
-
-        ```json
+      ```json
         Hash:001b92541ed0a22b0cb89018b561d895503206c0082c0ecf2d0b7e5182191eed
         Target:00
         Nonce:227
-        ```
+      ```
 
     - 227번만에 찾았다.
   - difficulty가 3일 때
 
-        ```json
+      ```json
         Hash:0006bc9ad4253c42e32b546dc17e5ea3fedaecdabef371b09906cea9387e8695
         Target:000
         Nonce:10284
-        ```
+      ```
 
     - 10284번 걸렸다.
   - difficulty가 4일 때
 
-        ```json
+      ```json
         Hash:0000e49eab06aa7a6b3aef7708991b91a7e01451fd67f520b832b89b18f4e7de
         Target:0000
         Nonce:60067
-        ```
-
+      ```
     - 60067번
 - 난이도가 조금만 올라가도 엄청나게 연산이 많이 필요한 것을 느낄 수 있다.
 - 실제 비트코인은 좀 더 복잡하다
@@ -2712,7 +2673,7 @@ ___
 - 소스 코드
   - blockchain/block.go
 
-        ```go
+      ```go
         func (b *Block) mine() {
          target := strings.Repeat("0", b.Difficulty)
          for {
@@ -2729,7 +2690,7 @@ ___
         
          }
         }
-        ```
+      ```
 
 - 실행 결과
   - Method : GET
@@ -2777,7 +2738,7 @@ ___
 - 소스 코드
   - chain.go
 
-        ```go
+      ```go
         
         const (
          defaultDifficulty  int = 2
@@ -2837,11 +2798,12 @@ ___
           // 난이도가 변경된 후 블록이 5개가 추가되지 않았으면 현재 난이도를 그대로 유지한다.
           return b.CurrentDifficulty
          }
-        ```
+        }
+      ```
 
   - block.go
 
-        ```go
+      ```go
         type Block struct {
          Data       string `json:"data"`
          Hash       string `json:"hash"`
@@ -2881,7 +2843,7 @@ ___
          return block
         }
         
-        ```
+      ```
 
 - 실행 결과
   - Method : GET
@@ -2913,7 +2875,7 @@ ___
   - 기능 : 현재 체인의 상태 가져오기
   - 결과
 
-        ```go
+      ```go
         HTTP/1.1 200 OK
         Content-Type: application/json
         Date: Sat, 31 Dec 2022 04:27:48 GMT
@@ -2925,28 +2887,28 @@ ___
           "height": 1,
           "currentdifficulty": 2
         }
-        ```
+      ```
 
   - Method : POST
   - URL : [http://localhost:4000/blocks](http://localhost:4000/blocks)
   - 기능 : JSON형태의 값을 받아 블록 하나 생성하기
     - 전달 된 값
 
-            ```go
+        ```go
             {
               "message" : "Blockchain Test"
             }
-            ```
+        ```
 
   - 결과
 
-        ```go
+      ```go
         HTTP/1.1 201 Created
         Content-Type: application/json
         Date: Sat, 31 Dec 2022 04:29:35 GMT
         Content-Length: 0
         Connection: close
-        ```
+      ```
 
 ### 시나리오 진행
 
@@ -2954,30 +2916,189 @@ ___
 
   - 초기 상태
 
-        ```go
+      ```json
         {
           "newestHash": "00005e8d76daa1d457e5cde329901a1c1bd352cb00e4d626f3571c6431d2dd36",
           "height": 1,
           "currentdifficulty": 2
         }
-        ```
+      ```
 
   - 블록이 6번째에 난이도가 변한것을 알 수 있다.
 
-        ```go
+      ```json
         {
           "newestHash": "000e4683d1ca7256e62118d1cffde70b5957f9813d32e6f7f0b4873f5df1d81c",
           "height": 6,
           "currentdifficulty": 3
         }
-        ```
+      ```
 
   - 난이도가 재설정된 블록 부터 시작해서 8분 미만으로 5개의 블록이 추가로 생성되었기에 난이도가 또 올라간 것을 확인할 수 있다.
 
-        ```go
+      ```json
         {
           "newestHash": "0000be41b16c285e84f5b5deec30317127f1612e4c66e8d5016e3ce484a100ea",
           "height": 11,
           "currentdifficulty": 4
         }
+      ```
+---
+
+# 트랜잭션 구축
+
+**비트코인은 UTXO를 이용하여 트랜잭션을 만든다.**
+
+Tx
+
+- TxIn[] : 거래를 실행하기 이전에 내 주머니에 있는 돈
+- TxOut[] : 거래가 끝났을 때 각각의 사람들이 갖고있는 액수
+
+```go
+Tx
+ TxIn[5천원(프동프동)]
+ TxOut[0원(프동프동), 5천원(A User)]
+```
+
+- 만약 5천원을 주고싶은데 1만원 지폐로 가지고 있을 경우
+
+```go
+TX
+ TxIn[1만원(프동프동)]
+ TxOut[5천원(A User)/5천원(프동프동)]
+```
+
+- 채굴자(코인베이스의 거래)가 코인을 딱 채굴했을 시 상태
+  - 채굴자가 코인을 채굴했을 시 Input값은 블록체인이다.
+  - Output 값은 채굴자다.
+
+```go
+Tx
+ TxIn[$10(blockchain)]
+ TXOut[$10(miner)]
+```
+
+## 코인베이스에서 채굴자에게 코인을 주도록 만들고 트랜잭션에 기록하기
+
+- 시나리오
+  - 블록 생성 시(채굴 시)
+    - 프동프동이란 사람이 COINBASE로 부터 채굴한 코인을 받는다
+
+        ```go
+        Tx 
+         TxIn(소유자 : COINBASE, 가진 코인의 수: 50개)
+         TxOut(소유자 : 프동프동, 가진 코인의 수 : 50개
         ```
+
+- 소스 코드
+  - blockchain/block.go
+
+      ```go
+        func createBlock(prevHash string, height int) *Block {
+         block := &Block{
+        
+          Hash:       "",
+          PrevHash:   prevHash,
+          Height:     height,
+          Difficulty: Blockchain().difficulty(),
+          Nonce:      0,
+          // 블록 생성 시 채굴자의 이름을 가지고 트랜잭션을 만들고 블록에 포함시킨다.
+          Transactions: []*Tx{makeCoinbaseTx("fdongfdong")},
+         }
+         block.mine()
+         block.persist()
+         return block
+        }
+      ```
+
+  - transaction/transaction.go
+
+      ```go
+        package blockchain
+        
+        import (
+         "coin/exam36/utils"
+         "time"
+        )
+        
+        const (
+         minerReward int = 50
+        )
+        
+        type Tx struct {
+         Id        string   `json:"id"`
+         Timestamp int      `json:"timestamp"`
+         TxIns     []*TxIn  `json:"txins"`
+         TxOuts    []*TxOut `json:"txouts"`
+        }
+        
+        func (t *Tx) getId() {
+         t.Id = utils.Hash(t)
+        }
+        
+        type TxIn struct {
+         Owner  string `json:"owner"`
+         Amount int    `json:"amount"`
+        }
+        
+        type TxOut struct {
+         Owner  string `json:"owner"`
+         Amount int    `json:"amount"`
+        }
+        // 코인베이스에서 채굴자에게 코인을 주기 위해(거래) 트랜잭션을 만든다.
+        func makeCoinbaseTx(address string) *Tx {
+         txIns := []*TxIn{
+          {"COINBASE", minerReward},
+         }
+         txOuts := []*TxOut{
+          {address, minerReward},
+         }
+         tx := Tx{
+          Id:        "",
+          Timestamp: int(time.Now().Unix()),
+          TxIns:     txIns,
+          TxOuts:    txOuts,
+         }
+         tx.getId()
+         return &tx
+        }
+      ```
+
+- 실행 결과
+  - 블록이 생성되었을 때
+
+      ```json
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        Date: Sat, 31 Dec 2022 05:42:10 GMT
+        Content-Length: 342
+        Connection: close
+        
+        [
+          {
+            "hash": "007870047badd28511c43d3b4d8108fd9e346bc89113636ecfabf396dda01541",
+            "height": 1,
+            "defficulty": 2,
+            "nonce": 226,
+            "timestamp": 1672465330,
+            "Transactions": [
+              {
+                "id": "bebd0536f46ded4f0e2c053c7e002dafb0fd1cc68233f73ae41850dd19b39ed8",
+                "timestamp": 1672465330,
+                "txins": [
+                  {
+                    "owner": "COINBASE",
+                    "amount": 50
+                  }
+                ],
+                "txouts": [
+                  {
+                    "owner": "fdongfdong",
+                    "amount": 50
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      ```

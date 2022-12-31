@@ -1,8 +1,8 @@
 package cli
 
 import (
-	"coin/exam35/explorer"
-	"coin/exam35/rest"
+	"coin/exam36/explorer"
+	"coin/exam36/rest"
 	"flag"
 	"fmt"
 	"os"

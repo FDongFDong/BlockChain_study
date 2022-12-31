@@ -1,4 +1,4 @@
-module coin/exam35
+module coin/exam36
 
 go 1.19
 

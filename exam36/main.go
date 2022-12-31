@@ -1,8 +1,8 @@
 package main
 
 import (
-	"coin/exam35/cli"
-	"coin/exam35/db"
+	"coin/exam36/cli"
+	"coin/exam36/db"
 )
 
 func main() {

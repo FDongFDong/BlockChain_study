@@ -1,8 +1,8 @@
 package blockchain
 
 import (
-	"coin/exam35/db"
-	"coin/exam35/utils"
+	"coin/exam36/db"
+	"coin/exam36/utils"
 	"errors"
 	"fmt"
 	"strings"
@@ -10,13 +10,13 @@ import (
 )
 
 type Block struct {
-	Data       string `json:"data"`
-	Hash       string `json:"hash"`
-	PrevHash   string `json:"prevhash,omitempty"`
-	Height     int    `json:"height"`
-	Difficulty int    `json:"defficulty"`
-	Nonce      int    `json:"nonce"`
-	Timestamp  int    `json:"timestamp"`
+	Hash         string `json:"hash"`
+	PrevHash     string `json:"prevhash,omitempty"`
+	Height       int    `json:"height"`
+	Difficulty   int    `json:"defficulty"`
+	Nonce        int    `json:"nonce"`
+	Timestamp    int    `json:"timestamp"`
+	Transactions []*Tx  `json:"transactions"`
 }
 
 func (b *Block) persist() {
@@ -56,14 +56,16 @@ func (b *Block) mine() {
 	}
 }
 
-func createBlock(data string, prevHash string, height int) *Block {
+func createBlock(prevHash string, height int) *Block {
 	block := &Block{
-		Data:       data,
+
 		Hash:       "",
 		PrevHash:   prevHash,
 		Height:     height,
 		Difficulty: Blockchain().difficulty(),
 		Nonce:      0,
+		// 블록 생성 시 채굴자의 이름을 가지고 트랜잭션을 만든다.
+		Transactions: []*Tx{makeCoinbaseTx("fdongfdong")},
 	}
 	block.mine()
 	block.persist()
