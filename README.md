@@ -90,7 +90,7 @@ Go 언어로 블록체인 스터디
 - 소스 코드
   - main.go
 
-        ```go
+    ```go
         package main
         
         import (
@@ -114,11 +114,7 @@ Go 언어로 블록체인 스터디
          // 에러가 있을때만 실행
          log.Fatal(http.ListenAndServe(port, nil))
         }
-        ```
-
-- 실행 결과
-
-    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/42ae1c89-a7a3-4fc5-af83-1730ff727bff/Untitled.png)
+    ```
 
 ## Blockchain ↔ 백엔드 서버를 만들기 위한 build up 02
 
@@ -227,9 +223,6 @@ Go 언어로 블록체인 스터디
         }
     ```
 
-- 실행 결과
-
-    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/861cb04a-07d8-4ea2-815d-b488558c9ef0/Untitled.png)
 
 ### [Blockchain.Data](http://Blockchain.Data)를 웹페이지에 출력
 
@@ -381,11 +374,7 @@ Go 언어로 블록체인 스터디
   - partials/header.gohtml
     - 다음에 진행
 
-- 실행 결과
-  - 전체 코드를 실행하면 에러가 생긴다.(home.gohtml 위치 변경하였음)
-  - mvp.css를 입혔을 경우
 
-        ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/87d12129-d7aa-4546-b283-0d2777a8c0de/Untitled.png)
 
 ### 앞서 만든 서버를 Refactoring 하기
 
