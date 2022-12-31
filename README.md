@@ -44,6 +44,7 @@ Go 언어로 블록체인 스터디
     - [시나리오 진행](#시나리오-진행)
 - [트랜잭션 구축](#트랜잭션-구축)
   - [코인베이스에서 채굴자에게 코인을 주도록 만들고 트랜잭션에 기록하기](#코인베이스에서-채굴자에게-코인을-주도록-만들고-트랜잭션에-기록하기)
+  - [보유한 자산 조회하기](#보유한-자산-조회하기)
 
 
 ## Genesis Block 만들어보기
@@ -3091,3 +3092,118 @@ Tx
           }
         ]
       ```
+---
+
+## 보유한 자산 조회하기
+
+- 트랜잭션에 포함된 owner로 자산 조회하기
+- RESTful하게 가져오기
+- 소스 코드
+  - main.go
+
+        ```go
+        
+        // 쿼리에 total 값이 true이면 해당하는 address의 자산을 모두 합쳐서 Client에게 보내준다.
+        func balance(rw http.ResponseWriter, r *http.Request) {
+         vars := mux.Vars(r)
+         address := vars["address"]
+         total := r.URL.Query().Get("total")
+         switch total {
+         case "true":
+          amount := blockchain.Blockchain().BalanceByAddress(address)
+          json.NewEncoder(rw).Encode(balanceResponse{address, amount})
+         default:
+          utils.HandleErr(json.NewEncoder(rw).Encode(blockchain.Blockchain().TxOutsByAddress(address)))
+         }
+        }
+        
+        func Start(aPort int) {
+         router := mux.NewRouter()
+         router.HandleFunc("/balance/{address}", balance).Methods("GET")
+         fmt.Printf("Listening on http://localhost%s\n", port)
+         log.Fatal(http.ListenAndServe(port, router))
+        }
+        ```
+
+  - blockchain/chain.go
+
+    ```go
+        // 블록의 트랜잭션 출력값을 모두 가져오는 함수
+        func (b *blockchain) txOuts() []*TxOut {
+         var txOuts []*TxOut
+         // 모든 블록을 가져온다.
+         blocks := b.Blocks()
+         for _, block := range blocks {
+          // 모든 블록의 TxOuts을 가져온다.
+          for _, tx := range block.Transactions {
+           txOuts = append(txOuts, tx.TxOuts...)
+          }
+         }
+         return txOuts
+        }
+        
+        // 블록의 트랜잭션 출력값 리스트에서 address에 해당하는 값들만 찾아오는 함수
+        func (b *blockchain) TxOutsByAddress(address string) []*TxOut {
+         var ownedTxOuts []*TxOut
+         txOuts := b.txOuts()
+         for _, txOut := range txOuts {
+          if txOut.Owner == address {
+           ownedTxOuts = append(ownedTxOuts, txOut)
+          }
+         }
+         return ownedTxOuts
+        }
+        
+        // 해당하는 address의 자산을 모두 합쳐서 반환하는 함수
+        func (b *blockchain) BalanceByAddress(address string) int {
+         txOuts := b.TxOutsByAddress(address)
+         var amount int
+         for _, txOut := range txOuts {
+          amount += txOut.Amount
+         }
+         return amount
+        }
+    ```
+
+- 실행 결과
+  - 쿼리로 total을 줬을 때
+    - Method : GET
+    - URL : [http://localhost:4000/balance/fdongfdong?total=true](http://localhost:4000/balance/fdongfdong?total=true)
+    - 기능 : 해당하는 address에 모든 자산을 합쳐서 가져온다.
+
+        ```json
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        Date: Sat, 31 Dec 2022 09:08:43 GMT
+        Content-Length: 39
+        Connection: close
+        
+        {
+          "address": "fdongfdong",
+          "balance": 100
+        }
+        ```
+
+  - 쿼리를 주지 않았을 때
+    - Method : GET
+    - URL : [http://localhost:4000/balance/fdongfdong](http://localhost:4000/balance/fdongfdong)
+    - 기능 :  각각의 트랜잭션 출력값을 가져온다.
+
+        ```json
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        Date: Sat, 31 Dec 2022 09:08:53 GMT
+        Content-Length: 72
+        Connection: close
+        
+        [
+          {
+            "owner": "fdongfdong",
+            "amount": 50
+          },
+          {
+            "owner": "fdongfdong",
+            "amount": 50
+          }
+        ]
+        ```
