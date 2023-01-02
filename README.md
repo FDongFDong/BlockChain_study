@@ -3219,7 +3219,7 @@ Tx
 
 ## Mempool에 트랜잭션 생성하기
 
-- 소스 코드
+[소스 코드](https://github.com/FDongFDong/BlockChain_study/tree/main/exam38)
   - blockchain/transaction.go
 
     ```go
