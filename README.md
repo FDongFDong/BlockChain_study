@@ -45,6 +45,8 @@ Go 언어로 블록체인 스터디
 - [트랜잭션 구축](#트랜잭션-구축)
   - [코인베이스에서 채굴자에게 코인을 주도록 만들고 트랜잭션에 기록하기](#코인베이스에서-채굴자에게-코인을-주도록-만들고-트랜잭션에-기록하기)
   - [보유한 자산 조회하기](#보유한-자산-조회하기)
+- [Mempoll(메모리풀)](#mempoll메모리풀)
+  - [Mempool에 트랜잭션 생성하기](#mempool에-트랜잭션-생성하기)
 
 
 ## Genesis Block 만들어보기
@@ -3204,6 +3206,315 @@ Tx
           {
             "owner": "fdongfdong",
             "amount": 50
+          }
+        ]
+        ```
+---
+
+# Mempoll(메모리풀)
+
+아직 확정되지 않은 거래내역을 보관하는 곳
+
+→ 아직 Confirm 받지 않은 Transaction들이 들어가는 곳
+
+## Mempool에 트랜잭션 생성하기
+
+- 소스 코드
+  - blockchain/transaction.go
+
+    ```go
+    type mempool struct {
+      Txs []*Tx
+    }
+    
+    // 비어있는 mempool 생성
+    var Mempool *mempool = &mempool{}
+    
+    type Tx struct {
+      Id        string   `json:"id"`
+      Timestamp int      `json:"timestamp"`
+      TxIns     []*TxIn  `json:"txins"`
+      TxOuts    []*TxOut `json:"txouts"`
+    }
+    
+    type TxIn struct {
+      Owner  string `json:"owner"`
+      Amount int    `json:"amount"`
+    }
+    
+    type TxOut struct {
+      Owner  string `json:"owner"`
+      Amount int    `json:"amount"`
+    }
+    
+    // 유효한 트랜잭션을 생성하려면, 유저가 input에 돈이 들어있다는걸 보여주면 된다.
+    // Transaction Input을 가져와서 Transaction Output을 만들면 해당 Transaction은 유효해진다.
+    func makeTx(from, to string, amount int) (*Tx, error) {
+      // from의 잔고가 보내고자 하는 금액 보다 적으면 에러 출력
+      if Blockchain().BalanceByAddress(from) < amount {
+      return nil, errors.New("not enough money")
+      }
+      // 새로운 트랜잭션을 만들기 위해 txIns, txOuts을 생성한다.
+      var txIns []*TxIn
+      var txOuts []*TxOut
+    
+      total := 0
+      // 이전 TxOut으로 TxInput을 만들기 위해 요청한 사용자의 TxOut List를 가져온다.
+      oldTxOuts := Blockchain().TxOutsByAddress(from)
+      // total값에 TxOut을 모아서 amount 값이 되도록 한다.
+      for _, txOut := range oldTxOuts {
+      if total > amount {
+        break
+      }
+      // 보내려는 값이 일치할 때 까지 
+      txIn := &TxIn{txOut.Owner, txOut.Amount}
+      txIns = append(txIns, txIn)
+      total += txIn.Amount
+      }
+      change := total - amount
+      // TxOut에게 줄 거스름돈이 있을 경우
+      if change != 0 {
+      changeTxOut := &TxOut{from, change}
+      txOuts = append(txOuts, changeTxOut)
+      }
+      txOut := &TxOut{to, amount}
+      txOuts = append(txOuts, txOut)
+      // 새로운 트랜잭션을 만들어준다.
+      tx := &Tx{
+      Id:        "",
+      Timestamp: int(time.Now().Unix()),
+      TxIns:     txIns,
+      TxOuts:    txOuts,
+      }
+      tx.getId()
+      return tx, nil
+    }
+    
+    // 트랜잭션을 Mempool에 추가한다. 트랜잭션을 생성하지는 않는다.
+    // 어떠한 이유로 트랜잭션을 블록에 추가할 수 없으면 error을 리턴해준다.
+    func (m *mempool) AddTx(to string, amount int) error {
+      tx, err := makeTx("fdongfdong", to, amount)
+      if err != nil {
+      return err
+      }
+      // 트랜잭션이 정상적으로 만들어졌다면 Mempool에 추가해준다.
+      m.Txs = append(m.Txs, tx)
+      return nil
+    }
+    ```
+
+  - rest/rest.go
+
+    ```go
+    func mempool(rw http.ResponseWriter, r *http.Request) {
+      utils.HandleErr(json.NewEncoder(rw).Encode(blockchain.Mempool.Txs))
+    }
+    
+    func transactions(rw http.ResponseWriter, r *http.Request) {
+      var payload addTxPayload
+      utils.HandleErr(json.NewDecoder(r.Body).Decode(&payload))
+      err := blockchain.Mempool.AddTx(payload.To, payload.Amount)
+      if err != nil {
+      json.NewEncoder(rw).Encode(errorResponse{"not enough funds"})
+      }
+      rw.WriteHeader(http.StatusCreated)
+    }
+    
+    func Start(aPort int) {
+      router := mux.NewRouter()
+      port = fmt.Sprintf(":%d", aPort)
+      router.Use(jsonContentTypeMiddleware)
+      // ...
+      router.HandleFunc("/mempool", mempool).Methods("GET")
+      router.HandleFunc("/transactions", transactions).Methods("POST")
+      fmt.Printf("Listening on http://localhost%s\n", port)
+    }
+    ```
+
+- 실행 결과
+
+  - 기능 : mempool에 들어있는 트랜잭션 확인
+  - Method : GET
+  - URL : [http://localhost:4000/mempool](http://localhost:4000/mempool)
+
+  - 시나리오
+    - **기능 : 초기(블록체인) 상태 확인**
+    - Method : GET
+    - URL : [http://localhost:4000/status](http://localhost:4000/status)
+
+        ```json
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        Date: Mon, 02 Jan 2023 00:44:25 GMT
+        Content-Length: 115
+        Connection: close
+        
+        {
+          "newestHash": "00b904fb8d5a30754d81f8362b7bca54ba4d073689e8ab4af1d2be130bd085c1",
+          "height": 1,
+          "currentdifficulty": 2
+        }
+        ```
+
+    - **기능 : 블록체인 내에 있는 블록 확인**
+    - Method : GET
+    - URL : [http://localhost:4000/blocks](http://localhost:4000/blocks)
+
+        ```json
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        Date: Mon, 02 Jan 2023 00:45:02 GMT
+        Content-Length: 342
+        Connection: close
+        
+        [
+          {
+            "hash": "00b904fb8d5a30754d81f8362b7bca54ba4d073689e8ab4af1d2be130bd085c1",
+            "height": 1,
+            "defficulty": 2,
+            "nonce": 172,
+            "timestamp": 1672620199,
+            "transactions": [
+              {
+                "id": "c7186f0a495a53ec522353da9aa9d2ff38e0f5c23e4cfd91b5b209fdd6582932",
+                "timestamp": 1672620199,
+                "txins": [
+                  {
+                    "owner": "COINBASE",
+                    "amount": 50
+                  }
+                ],
+                "txouts": [
+                  {
+                    "owner": "fdongfdong",
+                    "amount": 50
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+        ```
+
+    - **기능 : 잔고가 부족한 상태에서 전송(트랜잭션 생성)**
+    - Method : POST
+    - URL :  [http://localhost:4000/transactions](http://localhost:4000/transactions)
+
+        ```json
+        {
+          "to" : "uou",
+          "amount" : 80
+        }
+        ```
+
+    - 결과
+
+        ```json
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        Date: Mon, 02 Jan 2023 00:46:48 GMT
+        Content-Length: 36
+        Connection: close
+        
+        {
+          "errorMessage": "not enough funds"
+        }
+        ```
+
+    - 기능 : 잔고가 부족하므로 **추가적인 채굴 진행**
+    - Method : POST
+    - URL : [http://localhost:4000/blocks](http://localhost:4000/blocks)
+
+        ```json
+        {
+          "message" : "Blockchain Test"
+        }
+        ```
+
+    - 실행 결과
+
+        ```json
+        HTTP/1.1 201 Created
+        Content-Type: application/json
+        Date: Mon, 02 Jan 2023 00:48:32 GMT
+        Content-Length: 0
+        Connection: close
+        ```
+
+    - **기능 : 잔고 확인**
+    - Method : GET
+    - URL : [http://localhost:4000/balance/fdongfdong](http://localhost:4000/balance/fdongfdong?total=true)
+
+        ```json
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        Date: Mon, 02 Jan 2023 00:49:18 GMT
+        Content-Length: 39
+        Connection: close
+        
+        {
+          "address": "fdongfdong",
+          "balance": 100
+        }
+        ```
+
+    - **기능 : 송금 진행(트랜잭션 생성)**
+    - Method : POST
+    - URL : [http://localhost:4000/transactions](http://localhost:4000/transactions)
+
+        ```json
+        {
+          "to" : "uou",
+          "amount" : 80
+        }
+        ```
+
+    - 실행 결과
+
+        ```json
+        HTTP/1.1 201 Created
+        Content-Type: application/json
+        Date: Mon, 02 Jan 2023 00:50:34 GMT
+        Content-Length: 0
+        Connection: close
+        ```
+
+    - 기능 : Mempool 확인
+    - Method : GET
+    - URL : [http://localhost:4000/mempool](http://localhost:4000/mempool)
+    - 실행 결과
+
+        ```json
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        Date: Mon, 02 Jan 2023 00:53:01 GMT
+        Content-Length: 253
+        Connection: close
+        
+        [
+          {
+            "id": "146702f253cf4cc4d5dfa0048302d6d3df07284a70fb940f589e15cb5651d36a",
+            "timestamp": 1672620634,
+            "txins": [
+              {
+                "owner": "fdongfdong",
+                "amount": 50
+              },
+              {
+                "owner": "fdongfdong",
+                "amount": 50
+              }
+            ],
+            "txouts": [
+              {
+                "owner": "fdongfdong",
+                "amount": 20
+              },
+              {
+                "owner": "uou",
+                "amount": 80
+              }
+            ]
           }
         ]
         ```
